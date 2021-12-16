@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 typedef struct Categorie {
  int idCat;
  char NomCat[50];
@@ -207,6 +208,7 @@ void SupprimerType(type T){
     }
 }
 void SupprimerPdt(Produit P){
+    printf("Produit Nom : %s \n",P.Nom);
     int K=0; // this variable is used to store Product column
     int L=0;
    for(int i=0;i<100;i++){
@@ -223,9 +225,11 @@ void SupprimerPdt(Produit P){
     for(int i=L;i<100;i++){
         Stock[i][K]=Stock[i+1][K];
     }
+
     //Mise a jour du Quantité
     TabQte[K]=TabQte[K]-1;
-   }
+       printf("Produit Supprimé \n");
+   }else printf("Quantite de produit < 10 !");
 
 }
 void MainMenu(){
@@ -276,9 +280,6 @@ void AfficherStock(Stock){
     printf("____________________________________________");
 
 }
-void VendreProduit(type T){
-
-}
 char * LoadDateSysteme(){
     time_t rawtime ;
     struct tm* timeinfo;
@@ -289,25 +290,68 @@ char * LoadDateSysteme(){
 
     return buffer ;
 }
-void MinDateExpiration(){
-int x=0;
-    /*for (int i = 0; i <NbType ; i++) {
-        if(TabType[i].idType==T.idType){
+struct Produit VendreProduit(int type){
+/*   for (int i = 0; i <NbType ; i++) {
+        if(TabType[i].idType==P.Typ.idType){
             x=i;
             break;
         }
-    }
-    int MMx=0,JJx=0,AAx=0;
+    }*/
+    printf("Type: %d \n",type);
+    int  x=type; // x va prendre l' idType
+    int MMx,AAx,JJx;
     MMx=Stock[0][x].DateExpiration.MM;
     JJx=Stock[0][x].DateExpiration.JJ;
-    AAx=Stock[0][x].DateExpiration.AA;*/
+    AAx=Stock[0][x].DateExpiration.AA;
+    printf("JJx: %d \n",JJx);
+    printf("MMx: %d \n",MMx);
+    printf("AAx: %d \n",AAx);
     char p[50] ;
     strcpy( p,LoadDateSysteme());
+    printf("%s",p);
+    int i=1;
+    int AA,MM,JJ;
+    printf("i1: %d \n",i);
+    while(i<100) {
+         AA= Stock[i][x].DateExpiration.AA;
+         MM= Stock[i][x].DateExpiration.MM;
+         JJ= Stock[i][x].DateExpiration.JJ;
+         printf("AAx: %d \n",AAx);
+        printf("AA : %d \n",AA);
+        if (AA > AAx) {
+            printf("if 1 \n");
+            printf("i: %d \n",i);
+            printf("x: %d \n",x);
+            printf("Produit Nom : %s",Stock[i][x].Nom);
+            return Stock[i][x];
 
+        }
+        else if ((AA < AAx)&&(MM > MMx)) {
+            printf("if 2 \n");
+            return Stock[i][x];
+            break;
+        }
+        else if (JJ > JJx) {
+            printf("if 3 \n");
+            return Stock[i][x];
+        }else i++;
 
-    /*for(int i=0;i<100;i++){
+    }
 
-    }*/
+}
+bool FichierProduit(struct Produit P){
+    FILE  *fichier ;
+     if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Projet\\Produit.txt","w+"))== NULL){
+         printf("Erreur dans l'ouverture de fichier Produit \n");
+         exit(1);
+     }else{
+         int i =1;
+         printf("\n");
+         fprintf(fichier,"%d\t%s\t%d\t%s\t%d\t%s\t%s",P.id,P.Nom,P.Typ.idType,P.Typ.NomType,P.Typ.Cat.idCat,P.Typ.Cat.NomCat,LoadDateSysteme());
+         printf("Fichier done");
+         return 1;
+     }
+    return 0 ;
 
 }
 /* Cettee fonction est utilisée pour trouver la date Systeme  */
@@ -331,6 +375,28 @@ void TestTables(){
     TabCat[0].idCat=1;
     TabCat[1].idCat=2;
     TabCat[2].idCat=3;
+   NbType=3;
+   Nbcat=3;
+   struct Produit *p ;
+   struct Produit *p2;
+    p=(struct Produit*) malloc(sizeof (struct Produit));
+    p->id=5;
+    strcpy(p->Nom,"Chips");
+    strcpy(p->Typ.NomType,"Ahmed");
+    p->Typ.idType=2;
+    p->DateExpiration.JJ=05;
+    p->DateExpiration.MM=05;
+    p->DateExpiration.AA=2005;
+    p2=(struct Produit*) malloc(sizeof (struct Produit));
+    p2->id=4;
+    strcpy(p2->Nom,"Chips");
+    strcpy(p2->Typ.NomType,"Ahmed");
+    p2->Typ.idType=2;
+    p2->DateExpiration.JJ=07;
+    p2->DateExpiration.MM=06;
+    p2->DateExpiration.AA=2008;
+    Stock[0][2]=*p;
+    Stock[1][2]=*p2;
 
 }
 int main()
@@ -375,6 +441,8 @@ int main()
         printf("IdCat: %d \n",TabCat[i].idCat);
     }
 */
-  MinDateExpiration();
+
+    TestTables();
+    FichierProduit(VendreProduit(2));
     return 0;
 }
