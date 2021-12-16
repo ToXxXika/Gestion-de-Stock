@@ -220,7 +220,6 @@ void SupprimerPdt(Produit P){
            }
        }
    }
-   // Mise a jour du Stock
    if (TabQte[K]>10){
     for(int i=L;i<100;i++){
         Stock[i][K]=Stock[i+1][K];
@@ -306,9 +305,6 @@ struct Produit VendreProduit(int type){
     printf("JJx: %d \n",JJx);
     printf("MMx: %d \n",MMx);
     printf("AAx: %d \n",AAx);
-    char p[50] ;
-    strcpy( p,LoadDateSysteme());
-    printf("%s",p);
     int i=1;
     int AA,MM,JJ;
     printf("i1: %d \n",i);
@@ -337,24 +333,51 @@ struct Produit VendreProduit(int type){
         }else i++;
 
     }
+}
+void ProduitSuppression(struct Produit *P) {
+    int K = 0; // this variable is used to store Product column
+    int L = 0;
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; i < 50; i++) {
+            if (Stock[i][j].id == P->id) {
+                K = j;
+                L = i;
+                break;
+            }
+        }
+    }
 
+    for (int i = L; i < 100; i++) {
+        Stock[i][K] = Stock[i + 1][K];
+    }
+    printf("Produit supprimé \n verifier le Fichier Produit.txt");
+}
+void StatMois(int MM,int AA){
+     FILE *fichier ;
+     char line[256];
+     if((fichier= fopen("C:\\Users\\mabro\\Desktop\\Projet\\Produit.txt","r"))== NULL) {
+         printf("Erreur dans l'ouverture de fichier Produit \n");
+     } else{
+         while(fgets(line, sizeof(line),fichier)){
+             printf("%s \n",line);
+         }
+     }
 }
 bool FichierProduit(struct Produit P){
     FILE  *fichier ;
      if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Projet\\Produit.txt","w+"))== NULL){
          printf("Erreur dans l'ouverture de fichier Produit \n");
-         exit(1);
+         return  0 ;
      }else{
-         int i =1;
          printf("\n");
+         printf(" Nom Cate %s \n",P.Typ.Cat.NomCat);
          fprintf(fichier,"%d\t%s\t%d\t%s\t%d\t%s\t%s",P.id,P.Nom,P.Typ.idType,P.Typ.NomType,P.Typ.Cat.idCat,P.Typ.Cat.NomCat,LoadDateSysteme());
-         printf("Fichier done");
+         printf("Operation terminée \n");
+         ProduitSuppression(&P);
+         fclose(fichier);
          return 1;
      }
-    return 0 ;
-
 }
-/* Cettee fonction est utilisée pour trouver la date Systeme  */
 
 void TestTables(){
     char NomType[50] = "Kamel";
@@ -395,6 +418,8 @@ void TestTables(){
     p2->DateExpiration.JJ=07;
     p2->DateExpiration.MM=06;
     p2->DateExpiration.AA=2008;
+    strcpy(p2->Typ.Cat.NomCat,"Potato");
+    p2->Typ.Cat.idCat=0;
     Stock[0][2]=*p;
     Stock[1][2]=*p2;
 
@@ -443,6 +468,6 @@ int main()
 */
 
     TestTables();
-    FichierProduit(VendreProduit(2));
+    StatMois(1,5);
     return 0;
 }
