@@ -264,7 +264,6 @@ void MainMenu(){
             break;
          case '0':
              exit(0);
-             break;
 
          default:
             printf("Choix errone\n");
@@ -352,20 +351,41 @@ void ProduitSuppression(struct Produit *P) {
     }
     printf("Produit supprimé \n verifier le Fichier Produit.txt");
 }
+char * Trim(char *Chaine){
+    int x=0;
+    while(1==1){
+        if((*Chaine == ' ') || (*Chaine == '\t') || (*Chaine =='\r') || (*Chaine == '\n')){
+            x++;
+            ++Chaine;
+        }else
+            break;
+    }
+    printf("Nombre d'espaces : %d \n",x);
+    int y = strlen(Chaine)-1;
+    while(1==1){
+        if((Chaine[y]== ' ')||(Chaine[y]== '\t') || (Chaine[y]=='\r') || (Chaine[y]=='\n')){
+            y--;
+        } else break;
+        y= strlen(Chaine)-y;
+        Chaine[strlen(Chaine)-y+1]='\0';
+        return Chaine;
+    }
+}
 void StatMois(int MM,int AA){
      FILE *fichier ;
      char line[256];
-     if((fichier= fopen("C:\\Users\\mabro\\Desktop\\Projet\\Produit.txt","r"))== NULL) {
+     if((fichier= fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","r"))== NULL) {
          printf("Erreur dans l'ouverture de fichier Produit \n");
      } else{
          while(fgets(line, sizeof(line),fichier)){
              printf("%s \n",line);
+             Trim(line);
          }
      }
 }
 bool FichierProduit(struct Produit P){
     FILE  *fichier ;
-     if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Projet\\Produit.txt","w+"))== NULL){
+     if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","w+"))== NULL){
          printf("Erreur dans l'ouverture de fichier Produit \n");
          return  0 ;
      }else{
@@ -468,6 +488,7 @@ int main()
 */
 
     TestTables();
+    FichierProduit(VendreProduit(2));
     StatMois(1,5);
     return 0;
 }
