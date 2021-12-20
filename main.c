@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <ctype.h>
 typedef struct Categorie {
  int idCat;
  char NomCat[50];
@@ -272,10 +273,30 @@ void MainMenu(){
 
 }
 /* Pour Menu Gestion Stock */
-void AfficherStock(Stock){
-    printf("Etat du Stock :");
-    printf("Categorie  Type    Qte  id-Pdt    Date-Exp");
-    printf("____________________________________________");
+void AfficherStock(){
+    printf(" Nbcat : %d \n",Nbcat);
+    printf(" NbType : %d \n",NbType);
+    int CptCat=0;
+    int CptType=0;
+    int CptQte=0;
+    printf("NomCat : %s \n",TabCat[CptCat].NomCat);
+    printf("Etat du Stock : \n");
+    printf("Categorie  Type    Qte  id-Pdt    Date-Exp \n");
+    printf("____________________________________________ \n");
+     while (CptCat<Nbcat){
+         if(strcmp(TabType[CptType].Cat.NomCat,TabCat[CptCat].NomCat)!=0){
+             CptType++;
+             CptQte++ ;
+         } else{
+             printf("%s\t%s\t%d\t",TabCat[CptCat].NomCat,TabType[CptType].NomType,TabQte[CptQte]);
+             for(int i=0;i<TabQte[CptType];i++){
+                 printf("%d\t%s",Stock[i][CptType].id,Stock[i][CptType].DateExpiration);
+             }
+             CptType++;
+             CptQte++;
+         }
+         CptCat++;
+     }
 
 }
 char * LoadDateSysteme(){
@@ -284,7 +305,7 @@ char * LoadDateSysteme(){
     static char buffer[80];
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer,80, "%m/%d/%Y.",timeinfo);
+    strftime(buffer,80, "%m/%d/%Y",timeinfo);
 
     return buffer ;
 }
@@ -333,6 +354,37 @@ struct Produit VendreProduit(int type){
 
     }
 }
+/* Cette fonction est utilisée pour extraire la date (from) la ligne dans le fichier  */
+const char* ExtractDate(char C[100]){
+    char ch[20]="";
+     int j=0;
+    for (int i= strlen(C)-10;i<=strlen(C);i++){
+        ch[j]=C[i];
+        j++;
+    }
+    const char *ch1=ch;
+    return ch1;
+}
+const char * ExtractCategorie(char C[60]){
+    char ch[20]="";
+    int j=0;
+    int i = strlen(C)-12;
+    while(isalnum(C[i])!=0){
+        j++;
+        i--;
+    }
+    i = strlen(C)-12;
+    int x=i-j+1;
+    int k=0;
+    while (x<=i){
+        ch[k]=C[x];
+        x++;
+        k++;
+    }
+    printf("ch= %s",ch);
+    const char *ch1=ch ;
+    return ch1;
+}
 void ProduitSuppression(struct Produit *P) {
     int K = 0; // this variable is used to store Product column
     int L = 0;
@@ -349,40 +401,31 @@ void ProduitSuppression(struct Produit *P) {
     for (int i = L; i < 100; i++) {
         Stock[i][K] = Stock[i + 1][K];
     }
-    printf("Produit supprimé \n verifier le Fichier Produit.txt");
+    printf("Produit supprime \n verifier le Fichier Produit.txt \n ");
 }
-char * Trim(char *Chaine){
-    int x=0;
-    while(1==1){
-        if((*Chaine == ' ') || (*Chaine == '\t') || (*Chaine =='\r') || (*Chaine == '\n')){
-            x++;
-            ++Chaine;
-        }else
-            break;
-    }
-    printf("Nombre d'espaces : %d \n",x);
-    int y = strlen(Chaine)-1;
-    while(1==1){
-        if((Chaine[y]== ' ')||(Chaine[y]== '\t') || (Chaine[y]=='\r') || (Chaine[y]=='\n')){
-            y--;
-        } else break;
-        y= strlen(Chaine)-y;
-        Chaine[strlen(Chaine)-y+1]='\0';
-        return Chaine;
-    }
-}
+
 void StatMois(int MM,int AA){
+    int VenteTotal=0 ;
      FILE *fichier ;
      char line[256];
+     char T[256]="";
+     char A[256]="";
      if((fichier= fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","r"))== NULL) {
          printf("Erreur dans l'ouverture de fichier Produit \n");
-     } else{
-         while(fgets(line, sizeof(line),fichier)){
-             printf("%s \n",line);
-             Trim(line);
+     }
+     while(1) {
+         if (fgets(line, sizeof(line), fichier) == NULL) {
+             break;
+         } else {
+             strcpy( T,ExtractDate(line));
+             strcpy(A,ExtractCategorie(line));
+             printf("La Date %s \n",T);
+             printf(" Categorie %s \n",A);
+         }
+
          }
      }
-}
+
 bool FichierProduit(struct Produit P){
     FILE  *fichier ;
      if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","w+"))== NULL){
@@ -390,9 +433,9 @@ bool FichierProduit(struct Produit P){
          return  0 ;
      }else{
          printf("\n");
-         printf(" Nom Cate %s \n",P.Typ.Cat.NomCat);
+         printf(" Nom Cat: %s \n",P.Typ.Cat.NomCat);
          fprintf(fichier,"%d\t%s\t%d\t%s\t%d\t%s\t%s",P.id,P.Nom,P.Typ.idType,P.Typ.NomType,P.Typ.Cat.idCat,P.Typ.Cat.NomCat,LoadDateSysteme());
-         printf("Operation terminée \n");
+         printf("Operation terminee \n");
          ProduitSuppression(&P);
          fclose(fichier);
          return 1;
@@ -400,49 +443,63 @@ bool FichierProduit(struct Produit P){
 }
 
 void TestTables(){
-    char NomType[50] = "Kamel";
-    char NomType2[50] = "Ahmed";
-    char NomType3[50] = "Oussema";
-    char NomCat[50]="Potato";
-    char NomCat2[50]="Tomato";
-    char NomCat3[50]="Felfel";
+
+    /******* Categorie *********/
+    char NomCat[50]="Conserve";
+    char NomCat2[50]="Boisson";
+    char NomCat3[50]="Episse";
     strcpy(TabCat[0].NomCat,NomCat);
     strcpy(TabCat[1].NomCat,NomCat2);
     strcpy(TabCat[2].NomCat,NomCat3);
+    TabCat[0].idCat=1;
+    TabCat[1].idCat=2;
+    TabCat[2].idCat=3;
+    /********* TYPE **********/
+    char NomType[50] = "Tomate";
+    char NomType2[50] = "Patate";
+    char NomType3[50] = "FELFEL";
     strcpy(TabType[0].NomType,NomType);
     strcpy(TabType[1].NomType,NomType2);
     strcpy(TabType[2].NomType,NomType3);
     TabType[0].idType=1;
     TabType[1].idType=2;
     TabType[2].idType=3;
-    TabCat[0].idCat=1;
-    TabCat[1].idCat=2;
-    TabCat[2].idCat=3;
-   NbType=3;
-   Nbcat=3;
+    strcpy(TabType[0].Cat.NomCat,NomCat);
+    strcpy(TabType[1].Cat.NomCat,NomCat);
+    strcpy(TabType[2].Cat.NomCat,NomCat);
+    TabType[0].Cat.idCat=1;
+    TabType[1].Cat.idCat=1;
+    TabType[2].Cat.idCat=1;
+    /*************** COMPTEUR **********/
+    NbType=3;
+    Nbcat=3;
+   /********* Produit ******************/
    struct Produit *p ;
    struct Produit *p2;
     p=(struct Produit*) malloc(sizeof (struct Produit));
     p->id=5;
     strcpy(p->Nom,"Chips");
-    strcpy(p->Typ.NomType,"Ahmed");
-    p->Typ.idType=2;
+    strcpy(p->Typ.NomType,NomType);
+    strcpy(p->Typ.Cat.NomCat,NomCat);
+    p->Typ.idType=1;
     p->DateExpiration.JJ=05;
     p->DateExpiration.MM=05;
     p->DateExpiration.AA=2005;
+    p->Typ.Cat.idCat=1;
     p2=(struct Produit*) malloc(sizeof (struct Produit));
     p2->id=4;
     strcpy(p2->Nom,"Chips");
-    strcpy(p2->Typ.NomType,"Ahmed");
-    p2->Typ.idType=2;
+    strcpy(p2->Typ.NomType,NomType);
+    p2->Typ.idType=1;
     p2->DateExpiration.JJ=07;
     p2->DateExpiration.MM=06;
     p2->DateExpiration.AA=2008;
-    strcpy(p2->Typ.Cat.NomCat,"Potato");
-    p2->Typ.Cat.idCat=0;
-    Stock[0][2]=*p;
-    Stock[1][2]=*p2;
-
+    strcpy(p2->Typ.Cat.NomCat,NomCat);
+    p2->Typ.Cat.idCat=1;
+    Stock[0][1]=*p;
+    Stock[1][1]=*p2;
+    TabQte[0]=2;
+    printf("P1 :%d \n",Stock[0][1].id);
 }
 int main()
 {
@@ -456,8 +513,6 @@ int main()
     P= (struct Produit*) malloc(sizeof (struct Produit));
 
     /* for (int i=0;i<2;i++){
-
-
          InitCat(A);
          RemplirTab(*A,TabCat);
      }*/
@@ -466,9 +521,6 @@ int main()
          AjouterType(*B,TabType);
          printf("********* NEXT *********** \n ");
      }
-
-
-
     InitProd(P);
     AjouterPdt(*P);
     InitType(B);
@@ -488,7 +540,6 @@ int main()
 */
 
     TestTables();
-    FichierProduit(VendreProduit(2));
     StatMois(1,5);
     return 0;
 }
