@@ -366,6 +366,7 @@ const char* ExtractDate(char C[100]){
     return ch1;
 }
 const char * ExtractCategorie(char C[60]){
+    printf("Categorie Dans la fonction : %s \n",C);
     char ch[20]="";
     int j=0;
     int i = strlen(C)-12;
@@ -381,7 +382,7 @@ const char * ExtractCategorie(char C[60]){
         x++;
         k++;
     }
-    printf("ch= %s",ch);
+   // printf("ch1= %s",ch);
     const char *ch1=ch ;
     return ch1;
 }
@@ -410,6 +411,8 @@ void StatMois(int MM,int AA){
         char Date[10];
      }DateCat;
      int VenteTotal=0 ;
+     int VenteParAnnee=0;
+     int VenteParMois=0;
      int i=0;
      FILE *fichier ;
      char line[256];
@@ -447,20 +450,36 @@ void StatMois(int MM,int AA){
                 }
            while(j<i){
                int mm= atoi(T[j].Date[0]+T[j].Date[1]);
-               int aa= atoi(T[i].Date[6]+T[i].Date[7]+T[i].Date[8]+T[i].Date[9]);
-
+               int aa= atoi(T[j].Date[6]+T[j].Date[7]+T[j].Date[8]+T[j].Date[9]);
+               if(aa==AA){
+                   VenteParAnnee++;
+               }
+               if(mm==MM){
+                   VenteParMois++;
+               }
+               j++;
            }
-     }
+           printf("Vente par année : %d \n ",VenteParAnnee);
+           printf("Vente par mois : %d \n",VenteParMois);
+           printf("Vente totale : %d \n",VenteTotal);
+           /** Vente par categorie **/
+           int H=0;
+           for(int F=0;F<i;F++){
+               printf("%s vendu : %d \n",T[F].Categorie,TabOcc[H]);
+               H++;
+           }
+}
 
 bool FichierProduit(struct Produit P){
     FILE  *fichier ;
-     if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","w+"))== NULL){
+     if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","a"))== NULL){
          printf("Erreur dans l'ouverture de fichier Produit \n");
          return  0 ;
      }else{
          printf("\n");
          printf(" Nom Cat: %s \n",P.Typ.Cat.NomCat);
          fprintf(fichier,"%d\t%s\t%d\t%s\t%d\t%s\t%s",P.id,P.Nom,P.Typ.idType,P.Typ.NomType,P.Typ.Cat.idCat,P.Typ.Cat.NomCat,LoadDateSysteme());
+         fprintf(fichier,"\n");
          printf("Operation terminee \n");
          ProduitSuppression(&P);
          fclose(fichier);
@@ -526,6 +545,8 @@ void TestTables(){
     Stock[1][1]=*p2;
     TabQte[0]=2;
     printf("P1 :%d \n",Stock[0][1].id);
+    FichierProduit(*p);
+    FichierProduit(*p2);
 }
 int main()
 {
