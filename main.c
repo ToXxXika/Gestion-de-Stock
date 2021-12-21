@@ -405,25 +405,51 @@ void ProduitSuppression(struct Produit *P) {
 }
 
 void StatMois(int MM,int AA){
-    int VenteTotal=0 ;
+     typedef struct DateCat{
+        char Categorie[50];
+        char Date[10];
+     }DateCat;
+     int VenteTotal=0 ;
+     int i=0;
      FILE *fichier ;
      char line[256];
-     char T[256]="";
-     char A[256]="";
-     if((fichier= fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","r"))== NULL) {
+     DateCat T[30];
+     int TabOcc[30];
+
+     if((fichier= fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","r"))== NULL)
          printf("Erreur dans l'ouverture de fichier Produit \n");
-     }
+
      while(1) {
          if (fgets(line, sizeof(line), fichier) == NULL) {
              break;
          } else {
-             strcpy( T,ExtractDate(line));
-             strcpy(A,ExtractCategorie(line));
-             printf("La Date %s \n",T);
-             printf(" Categorie %s \n",A);
+             DateCat DC;
+             strcpy(DC.Date, ExtractDate(line));
+             strcpy(DC.Categorie, ExtractCategorie(line));
+             T[i] = DC;
+             i++;
          }
+     }
+     int j=0;
+     int NbrOccurence;
+     int K=0;
+     /* Nombre de Vente Totale */
+       VenteTotal = i ;
+                for(int j=0;j<i;j++){
+                    NbrOccurence=0;
+                  for(int x=0;x<i;x++){
+                      if(strcmp(T[j].Categorie,T[x].Categorie)==0){
+                          NbrOccurence++;
+                      }
+                  }
+                TabOcc[K]=NbrOccurence;
+                K++;
+                }
+           while(j<i){
+               int mm= atoi(T[j].Date[0]+T[j].Date[1]);
+               int aa= atoi(T[i].Date[6]+T[i].Date[7]+T[i].Date[8]+T[i].Date[9]);
 
-         }
+           }
      }
 
 bool FichierProduit(struct Produit P){
