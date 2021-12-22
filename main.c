@@ -362,8 +362,6 @@ const char* ExtractDate(char C[100]){
      char x[1];
      for( i= strlen(C)-11;i<= strlen(C)-2;i++){
          ch[j]=C[i];
-         printf("C[%d]:%c\n",i,C[i]);
-         printf("CH[%d]:%c\n",j,ch[j]);
          j++;
      }
 // TODO : FIX ME PLEASE
@@ -445,7 +443,7 @@ void StatMois(int MM,int AA){
              }
          }
      }
-    printf("i apres boucle : %d \n",i);
+ //   printf("i apres boucle : %d \n",i);
      int j=0;
      int NbrOccurence;
      int K=0;
@@ -460,14 +458,15 @@ void StatMois(int MM,int AA){
                           NbrOccurence++;
                       }
                   }
-                    printf("NbOcc: %d \n",NbrOccurence);
+                  //  printf("NbOcc: %d \n",NbrOccurence);
                 TabOcc[K]=NbrOccurence;
                 K++;
                 }
 
            while(j<i){
+               char *ptr ;
 
-            /*   int mm= atoi((const char *) (T[j].Date[0] + T[j].Date[1]));
+               int mm= atoi( T[j].Date[0] + T[j].Date[1]);
                int aa= atoi((const char *)T[j].Date[6]+T[j].Date[7]+T[j].Date[8]+T[j].Date[9]);
                if(aa==AA){
                    VenteParAnnee++;
@@ -475,7 +474,7 @@ void StatMois(int MM,int AA){
                if(mm==MM){
                    VenteParMois++;
                }
-               */
+
                j++;
            }
            printf("Vente par année : %d \n ",VenteParAnnee);
