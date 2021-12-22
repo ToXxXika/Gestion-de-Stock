@@ -64,8 +64,8 @@ void InitProd(Produit *P){
     scanf("%s",&P->Nom);
     InitType(&P->Typ);
     InitDate(&P->DateExpiration);
-    printf("Product Loaded : %d\n",P->id);
-    printf("Product Loaded Nom : %s\n",P->Nom);
+    printf("Produit Chargé : %d\n",P->id);
+    printf("Produit Chargé Nom : %s\n",P->Nom);
 }
 
 /* Remplissage du Tableau Categorie */
@@ -124,7 +124,7 @@ void AjouterType(struct type T,type TabType[50]){
 }
 
 void RemplirTabQte(){
-    char ch[50]="";
+    char ch[50];
     int i;
     int j=0;
     int Compteur=0;
@@ -356,15 +356,18 @@ struct Produit VendreProduit(int type){
 }
 /* Cette fonction est utilisée pour extraire la date (from) la ligne dans le fichier  */
 const char* ExtractDate(char C[100]){
-    char ch[20]="";
+    char ch[20];
      int j=0;
-    int i= strlen(C);
-     while ( i< strlen(C)-10){
+     int i=0;
+     char x[1];
+     for( i= strlen(C)-11;i<= strlen(C)-2;i++){
          ch[j]=C[i];
-         i--;
+         printf("C[%d]:%c\n",i,C[i]);
+         printf("CH[%d]:%c\n",j,ch[j]);
          j++;
      }
-
+// TODO : FIX ME PLEASE
+    printf("CH: %s ",ch);
     const char *ch1=ch;
     return ch1;
 }
@@ -427,15 +430,19 @@ void StatMois(int MM,int AA){
          if (fgets(line, sizeof(line), fichier) == NULL) {
              break;
          } else {
-             printf("i: %d \n",i);
              DateCat DC;
              strcpy(DC.Date, ExtractDate(line));
-             printf("DCDATE: %s \n",DC.Date);
+             //printf("DCDATE: %s \n",DC.Date);
              strcpy(DC.Categorie, ExtractCategorie(line));
-             printf("DCCATEGORIE: %s \n",DC.Categorie);
-             T[i] = DC;
-             printf("T[%d]=%s",i,T[i].Categorie);
-             i++;
+             //printf("DCCATEGORIE: %s \n",DC.Categorie);
+             if((DC.Date == "")||(DC.Categorie=="")){
+                 printf("Erreur dans la date ou dans la categorie ! Veuillez verifier Extract Date ou Extract Categorie \n");
+                 break;
+             }else {
+                 T[i] = DC;
+                // printf("T[%d]=%s", i, T[i].Categorie);
+                 i++;
+             }
          }
      }
     printf("i apres boucle : %d \n",i);
@@ -458,11 +465,6 @@ void StatMois(int MM,int AA){
                 K++;
                 }
 
-    printf("j: %d \n",j);
-    printf("i: %d \n",i);
-    for(int o=0;o<i;o++){
-        printf("%s",T[o].Date);
-    }
            while(j<i){
 
             /*   int mm= atoi((const char *) (T[j].Date[0] + T[j].Date[1]));
