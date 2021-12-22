@@ -358,23 +358,25 @@ struct Produit VendreProduit(int type){
 const char* ExtractDate(char C[100]){
     char ch[20]="";
      int j=0;
-    for (int i= strlen(C)-10;i<=strlen(C);i++){
-        ch[j]=C[i];
-        j++;
-    }
+    int i= strlen(C);
+     while ( i< strlen(C)-10){
+         ch[j]=C[i];
+         i--;
+         j++;
+     }
+
     const char *ch1=ch;
     return ch1;
 }
 const char * ExtractCategorie(char C[60]){
-    printf("Categorie Dans la fonction : %s \n",C);
     char ch[20]="";
     int j=0;
-    int i = strlen(C)-12;
+    int i = strlen(C)-13;
     while(isalnum(C[i])!=0){
         j++;
         i--;
     }
-    i = strlen(C)-12;
+    i = strlen(C)-13;
     int x=i-j+1;
     int k=0;
     while (x<=i){
@@ -382,7 +384,6 @@ const char * ExtractCategorie(char C[60]){
         x++;
         k++;
     }
-   // printf("ch1= %s",ch);
     const char *ch1=ch ;
     return ch1;
 }
@@ -408,7 +409,7 @@ void ProduitSuppression(struct Produit *P) {
 void StatMois(int MM,int AA){
      typedef struct DateCat{
         char Categorie[50];
-        char Date[10];
+        char Date[11];
      }DateCat;
      int VenteTotal=0 ;
      int VenteParAnnee=0;
@@ -426,18 +427,25 @@ void StatMois(int MM,int AA){
          if (fgets(line, sizeof(line), fichier) == NULL) {
              break;
          } else {
+             printf("i: %d \n",i);
              DateCat DC;
              strcpy(DC.Date, ExtractDate(line));
+             printf("DCDATE: %s \n",DC.Date);
              strcpy(DC.Categorie, ExtractCategorie(line));
+             printf("DCCATEGORIE: %s \n",DC.Categorie);
              T[i] = DC;
+             printf("T[%d]=%s",i,T[i].Categorie);
              i++;
          }
      }
+    printf("i apres boucle : %d \n",i);
      int j=0;
      int NbrOccurence;
      int K=0;
      /* Nombre de Vente Totale */
-       VenteTotal = i ;
+       VenteTotal = i ;           //TODO: FIX THIS SHIT
+       printf("Vente TOTALE : %d \n",VenteTotal);
+       /******* Nombre de Vente par Categorie *******/
                 for(int j=0;j<i;j++){
                     NbrOccurence=0;
                   for(int x=0;x<i;x++){
@@ -445,18 +453,27 @@ void StatMois(int MM,int AA){
                           NbrOccurence++;
                       }
                   }
+                    printf("NbOcc: %d \n",NbrOccurence);
                 TabOcc[K]=NbrOccurence;
                 K++;
                 }
+
+    printf("j: %d \n",j);
+    printf("i: %d \n",i);
+    for(int o=0;o<i;o++){
+        printf("%s",T[o].Date);
+    }
            while(j<i){
-               int mm= atoi(T[j].Date[0]+T[j].Date[1]);
-               int aa= atoi(T[j].Date[6]+T[j].Date[7]+T[j].Date[8]+T[j].Date[9]);
+
+            /*   int mm= atoi((const char *) (T[j].Date[0] + T[j].Date[1]));
+               int aa= atoi((const char *)T[j].Date[6]+T[j].Date[7]+T[j].Date[8]+T[j].Date[9]);
                if(aa==AA){
                    VenteParAnnee++;
                }
                if(mm==MM){
                    VenteParMois++;
                }
+               */
                j++;
            }
            printf("Vente par année : %d \n ",VenteParAnnee);
@@ -490,7 +507,7 @@ bool FichierProduit(struct Produit P){
 void TestTables(){
 
     /******* Categorie *********/
-    char NomCat[50]="Conserve";
+    char NomCat[50]="HYK";
     char NomCat2[50]="Boisson";
     char NomCat3[50]="Episse";
     strcpy(TabCat[0].NomCat,NomCat);
@@ -546,7 +563,7 @@ void TestTables(){
     TabQte[0]=2;
     printf("P1 :%d \n",Stock[0][1].id);
     FichierProduit(*p);
-    FichierProduit(*p2);
+    //FichierProduit(*p2);
 }
 int main()
 {
