@@ -95,14 +95,14 @@ void AjouterType(struct type T,type TabType[50]){
     int Res2=-1;
       while(i<Nbcat){
           Res=strcmp(TabCat[i].NomCat,T.Cat.NomCat);
-          if(Res==0){
-              printf("Categorie deja ajoutee");
+          if(Res==-1){
+              printf("Categorie non trouvé");
               break;
           }else{
               i++;
           }
       }
-      if(Res==-1){
+      if(Res==0){
           if(NbType<50){
               while (j<NbType+1){
                 Res2= strcmp(TabType[j].NomType,T.NomType);
@@ -364,8 +364,6 @@ const char* ExtractDate(char C[100]){
          ch[j]=C[i];
          j++;
      }
-// TODO : FIX ME PLEASE
-    printf("CH: %s ",ch);
     const char *ch1=ch;
     return ch1;
 }
@@ -407,204 +405,214 @@ void ProduitSuppression(struct Produit *P) {
     printf("Produit supprime \n verifier le Fichier Produit.txt \n ");
 }
 
-void StatMois(int MM,int AA){
-     typedef struct DateCat{
+void StatMois(int MM,int AA) {
+    typedef struct DateCat {
         char Categorie[50];
         char Date[11];
-     }DateCat;
-     int VenteTotal=0 ;
-     int VenteParAnnee=0;
-     int VenteParMois=0;
-     int i=0;
-     FILE *fichier ;
-     char line[256];
-     DateCat T[30];
-     int TabOcc[30];
+    } DateCat;
+    int VenteTotal = 0;
+    int VenteParAnnee = 0;
+    int VenteParMois = 0;
+    int i = 0;
+    FILE *fichier;
+    char line[256];
+    DateCat T[30];
+    int TabOcc[30];
 
-     if((fichier= fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","r"))== NULL)
-         printf("Erreur dans l'ouverture de fichier Produit \n");
+    if ((fichier = fopen("C:\\Users\\mabro\\Desktop\\Produit.txt", "r")) == NULL)
+        printf("Erreur dans l'ouverture de fichier Produit \n");
 
-     while(1) {
-         if (fgets(line, sizeof(line), fichier) == NULL) {
-             break;
-         } else {
-             DateCat DC;
-             strcpy(DC.Date, ExtractDate(line));
-             //printf("DCDATE: %s \n",DC.Date);
-             strcpy(DC.Categorie, ExtractCategorie(line));
-             //printf("DCCATEGORIE: %s \n",DC.Categorie);
-             if((DC.Date == "")||(DC.Categorie=="")){
-                 printf("Erreur dans la date ou dans la categorie ! Veuillez verifier Extract Date ou Extract Categorie \n");
-                 break;
-             }else {
-                 T[i] = DC;
+    while (1) {
+        if (fgets(line, sizeof(line), fichier) == NULL) {
+            break;
+        } else {
+            DateCat DC;
+            strcpy(DC.Date, ExtractDate(line));
+            //printf("DCDATE: %s \n",DC.Date);
+            strcpy(DC.Categorie, ExtractCategorie(line));
+            //printf("DCCATEGORIE: %s \n",DC.Categorie);
+            if ((DC.Date == NULL) || (DC.Categorie == NULL)) {
+                printf("Erreur dans la date ou dans la categorie ! Veuillez verifier Extract Date ou Extract Categorie \n");
+                break;
+            } else {
+                T[i] = DC;
                 // printf("T[%d]=%s", i, T[i].Categorie);
-                 i++;
-             }
+                i++;
+            }
+        }
+    }
+    //   printf("i apres boucle : %d \n",i);
+    int j = 0;
+    int NbrOccurence;
+    int K = 0;
+    /* Nombre de Vente Totale */
+    VenteTotal = i;           //TODO: FIX THIS SHIT
+    printf("Vente TOTALE : %d \n", VenteTotal);
+    /******* Nombre de Vente par Categorie *******/
+    for (int j = 0; j < i; j++) {
+        NbrOccurence = 0;
+        for (int x = 0; x < i; x++) {
+            if (strcmp(T[j].Categorie, T[x].Categorie) == 0) {
+                NbrOccurence++;
+            }
+        }
+        //  printf("NbOcc: %d \n",NbrOccurence);
+        TabOcc[K] = NbrOccurence;
+        K++;
+
+        while (j < i) {
+            char mmc[2];
+            char aac[4];
+
+            for(int H=0;H<2;H++){
+               mmc[H]=T[j].Date[H];
+            }
+            int P=0;
+            for(int X=6;X<11;X++){
+                aac[P]=T[j].Date[X];
+                P++;
+            }
+            char annee[5];
+            char mois[5];
+            itoa(AA,annee,10);
+            itoa(MM,mois,10);
+            if(strcmp(annee,aac)==0){
+                VenteParAnnee++;
+            }
+            if(strcmp(mmc,mois)==0){
+                VenteParMois++;
+            }
+            j++;
+        }
+        printf("Vente par année : %d \n ", VenteParAnnee);
+        printf("Vente par mois : %d \n", VenteParMois);
+        printf("Vente totale : %d \n", VenteTotal);
+        /** Vente par categorie **/
+        int H = 0;
+        for (int F = 0; F < i; F++) {
+            printf("%s vendu : %d \n", T[F].Categorie, TabOcc[H]);
+            H++;
+        }
+    }
+}
+    bool FichierProduit(struct Produit P) {
+        FILE *fichier;
+        if ((fichier = fopen("C:\\Users\\mabro\\Desktop\\Produit.txt", "a")) == NULL) {
+            printf("Erreur dans l'ouverture de fichier Produit \n");
+            return 0;
+        } else {
+            printf("\n");
+            printf(" Nom Cat: %s \n", P.Typ.Cat.NomCat);
+            fprintf(fichier, "%d\t%s\t%d\t%s\t%d\t%s\t%s", P.id, P.Nom, P.Typ.idType, P.Typ.NomType, P.Typ.Cat.idCat,
+                    P.Typ.Cat.NomCat, LoadDateSysteme());
+            fprintf(fichier, "\n");
+            printf("Operation terminee \n");
+            ProduitSuppression(&P);
+            fclose(fichier);
+            return 1;
+        }
+    }
+
+    void TestTables() {
+
+        /******* Categorie *********/
+        char NomCat[50] = "HYK";
+        char NomCat2[50] = "Boisson";
+        char NomCat3[50] = "Episse";
+        strcpy(TabCat[0].NomCat, NomCat);
+        strcpy(TabCat[1].NomCat, NomCat2);
+        strcpy(TabCat[2].NomCat, NomCat3);
+        TabCat[0].idCat = 1;
+        TabCat[1].idCat = 2;
+        TabCat[2].idCat = 3;
+        /********* TYPE **********/
+        char NomType[50] = "Tomate";
+        char NomType2[50] = "Patate";
+        char NomType3[50] = "FELFEL";
+        strcpy(TabType[0].NomType, NomType);
+        strcpy(TabType[1].NomType, NomType2);
+        strcpy(TabType[2].NomType, NomType3);
+        TabType[0].idType = 1;
+        TabType[1].idType = 2;
+        TabType[2].idType = 3;
+        strcpy(TabType[0].Cat.NomCat, NomCat);
+        strcpy(TabType[1].Cat.NomCat, NomCat);
+        strcpy(TabType[2].Cat.NomCat, NomCat);
+        TabType[0].Cat.idCat = 1;
+        TabType[1].Cat.idCat = 1;
+        TabType[2].Cat.idCat = 1;
+        /*************** COMPTEUR **********/
+        NbType = 3;
+        Nbcat = 3;
+        /********* Produit ******************/
+        struct Produit *p;
+        struct Produit *p2;
+        p = (struct Produit *) malloc(sizeof(struct Produit));
+        p->id = 5;
+        strcpy(p->Nom, "Chips");
+        strcpy(p->Typ.NomType, NomType);
+        strcpy(p->Typ.Cat.NomCat, NomCat);
+        p->Typ.idType = 1;
+        p->DateExpiration.JJ = 05;
+        p->DateExpiration.MM = 05;
+        p->DateExpiration.AA = 2005;
+        p->Typ.Cat.idCat = 1;
+        p2 = (struct Produit *) malloc(sizeof(struct Produit));
+        p2->id = 4;
+        strcpy(p2->Nom, "Chips");
+        strcpy(p2->Typ.NomType, NomType);
+        p2->Typ.idType = 1;
+        p2->DateExpiration.JJ = 07;
+        p2->DateExpiration.MM = 06;
+        p2->DateExpiration.AA = 2008;
+        strcpy(p2->Typ.Cat.NomCat, NomCat);
+        p2->Typ.Cat.idCat = 1;
+        Stock[0][1] = *p;
+        Stock[1][1] = *p2;
+        TabQte[0] = 2;
+        printf("P1 :%d \n", Stock[0][1].id);
+        FichierProduit(*p);
+        //FichierProduit(*p2);
+    }
+
+    int main() {
+        /* Declaration des Pointeurs et Allocations Dynamiques */
+        struct Categorie *A;
+        struct type *B;
+        struct Produit *P;
+
+        A = (struct Categorie *) malloc(sizeof(struct Categorie));
+        B = (struct type *) malloc(sizeof(struct type));
+        P = (struct Produit *) malloc(sizeof(struct Produit));
+
+        /* for (int i=0;i<2;i++){
+             InitCat(A);
+             RemplirTab(*A,TabCat);
+         }*/
+        /* for(int i=0;i<2;i++){
+             InitType(B);
+             AjouterType(*B,TabType);
+             printf("********* NEXT *********** \n ");
          }
-     }
- //   printf("i apres boucle : %d \n",i);
-     int j=0;
-     int NbrOccurence;
-     int K=0;
-     /* Nombre de Vente Totale */
-       VenteTotal = i ;           //TODO: FIX THIS SHIT
-       printf("Vente TOTALE : %d \n",VenteTotal);
-       /******* Nombre de Vente par Categorie *******/
-                for(int j=0;j<i;j++){
-                    NbrOccurence=0;
-                  for(int x=0;x<i;x++){
-                      if(strcmp(T[j].Categorie,T[x].Categorie)==0){
-                          NbrOccurence++;
-                      }
-                  }
-                  //  printf("NbOcc: %d \n",NbrOccurence);
-                TabOcc[K]=NbrOccurence;
-                K++;
-                }
+        InitProd(P);
+        AjouterPdt(*P);
+        InitType(B);
+        SupprimerType(*B);
+    */
+        /*  TestTables();
+          for(int i=0;i<=2;i++){
+              printf("NomCat: %s \n",TabCat[i].NomCat);
+              printf("IdCat: %d \n",TabCat[i].idCat);
+          }
+          InitCat(A);
+          SupprimerCat(*A);
+          for(int i=0;i<2;i++){
+              printf("NomCat: %s \n",TabCat[i].NomCat);
+              printf("IdCat: %d \n",TabCat[i].idCat);
+          }
+      */
 
-           while(j<i){
-               char *ptr ;
-
-               int mm= atoi( T[j].Date[0] + T[j].Date[1]);
-               int aa= atoi((const char *)T[j].Date[6]+T[j].Date[7]+T[j].Date[8]+T[j].Date[9]);
-               if(aa==AA){
-                   VenteParAnnee++;
-               }
-               if(mm==MM){
-                   VenteParMois++;
-               }
-
-               j++;
-           }
-           printf("Vente par année : %d \n ",VenteParAnnee);
-           printf("Vente par mois : %d \n",VenteParMois);
-           printf("Vente totale : %d \n",VenteTotal);
-           /** Vente par categorie **/
-           int H=0;
-           for(int F=0;F<i;F++){
-               printf("%s vendu : %d \n",T[F].Categorie,TabOcc[H]);
-               H++;
-           }
-}
-
-bool FichierProduit(struct Produit P){
-    FILE  *fichier ;
-     if ((fichier =fopen("C:\\Users\\mabro\\Desktop\\Produit.txt","a"))== NULL){
-         printf("Erreur dans l'ouverture de fichier Produit \n");
-         return  0 ;
-     }else{
-         printf("\n");
-         printf(" Nom Cat: %s \n",P.Typ.Cat.NomCat);
-         fprintf(fichier,"%d\t%s\t%d\t%s\t%d\t%s\t%s",P.id,P.Nom,P.Typ.idType,P.Typ.NomType,P.Typ.Cat.idCat,P.Typ.Cat.NomCat,LoadDateSysteme());
-         fprintf(fichier,"\n");
-         printf("Operation terminee \n");
-         ProduitSuppression(&P);
-         fclose(fichier);
-         return 1;
-     }
-}
-
-void TestTables(){
-
-    /******* Categorie *********/
-    char NomCat[50]="HYK";
-    char NomCat2[50]="Boisson";
-    char NomCat3[50]="Episse";
-    strcpy(TabCat[0].NomCat,NomCat);
-    strcpy(TabCat[1].NomCat,NomCat2);
-    strcpy(TabCat[2].NomCat,NomCat3);
-    TabCat[0].idCat=1;
-    TabCat[1].idCat=2;
-    TabCat[2].idCat=3;
-    /********* TYPE **********/
-    char NomType[50] = "Tomate";
-    char NomType2[50] = "Patate";
-    char NomType3[50] = "FELFEL";
-    strcpy(TabType[0].NomType,NomType);
-    strcpy(TabType[1].NomType,NomType2);
-    strcpy(TabType[2].NomType,NomType3);
-    TabType[0].idType=1;
-    TabType[1].idType=2;
-    TabType[2].idType=3;
-    strcpy(TabType[0].Cat.NomCat,NomCat);
-    strcpy(TabType[1].Cat.NomCat,NomCat);
-    strcpy(TabType[2].Cat.NomCat,NomCat);
-    TabType[0].Cat.idCat=1;
-    TabType[1].Cat.idCat=1;
-    TabType[2].Cat.idCat=1;
-    /*************** COMPTEUR **********/
-    NbType=3;
-    Nbcat=3;
-   /********* Produit ******************/
-   struct Produit *p ;
-   struct Produit *p2;
-    p=(struct Produit*) malloc(sizeof (struct Produit));
-    p->id=5;
-    strcpy(p->Nom,"Chips");
-    strcpy(p->Typ.NomType,NomType);
-    strcpy(p->Typ.Cat.NomCat,NomCat);
-    p->Typ.idType=1;
-    p->DateExpiration.JJ=05;
-    p->DateExpiration.MM=05;
-    p->DateExpiration.AA=2005;
-    p->Typ.Cat.idCat=1;
-    p2=(struct Produit*) malloc(sizeof (struct Produit));
-    p2->id=4;
-    strcpy(p2->Nom,"Chips");
-    strcpy(p2->Typ.NomType,NomType);
-    p2->Typ.idType=1;
-    p2->DateExpiration.JJ=07;
-    p2->DateExpiration.MM=06;
-    p2->DateExpiration.AA=2008;
-    strcpy(p2->Typ.Cat.NomCat,NomCat);
-    p2->Typ.Cat.idCat=1;
-    Stock[0][1]=*p;
-    Stock[1][1]=*p2;
-    TabQte[0]=2;
-    printf("P1 :%d \n",Stock[0][1].id);
-    FichierProduit(*p);
-    //FichierProduit(*p2);
-}
-int main()
-{
-    /* Declaration des Pointeurs et Allocations Dynamiques */
-     struct Categorie *A;
-     struct type *B ;
-     struct Produit *P;
-
-    A= (struct Categorie*) malloc(sizeof(struct Categorie));
-    B= (struct type*) malloc(sizeof(struct type));
-    P= (struct Produit*) malloc(sizeof (struct Produit));
-
-    /* for (int i=0;i<2;i++){
-         InitCat(A);
-         RemplirTab(*A,TabCat);
-     }*/
-    /* for(int i=0;i<2;i++){
-         InitType(B);
-         AjouterType(*B,TabType);
-         printf("********* NEXT *********** \n ");
-     }
-    InitProd(P);
-    AjouterPdt(*P);
-    InitType(B);
-    SupprimerType(*B);
-*/
-  /*  TestTables();
-    for(int i=0;i<=2;i++){
-        printf("NomCat: %s \n",TabCat[i].NomCat);
-        printf("IdCat: %d \n",TabCat[i].idCat);
+        TestTables();
+        StatMois(12, 2021);
+        return 0;
     }
-    InitCat(A);
-    SupprimerCat(*A);
-    for(int i=0;i<2;i++){
-        printf("NomCat: %s \n",TabCat[i].NomCat);
-        printf("IdCat: %d \n",TabCat[i].idCat);
-    }
-*/
-
-    TestTables();
-    StatMois(1,5);
-    return 0;
-}
