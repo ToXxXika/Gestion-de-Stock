@@ -128,7 +128,7 @@ void RemplirTabQte(){
     int i;
     int j=0;
     int Compteur=0;
-    ch[50]=TabType[0].NomType;
+    ch[49]=TabType[0].NomType;
      for(i=1;i<NbType;i++){
          int Res= strcmp(TabType[i].NomType,ch);
          if(Res == 0){
